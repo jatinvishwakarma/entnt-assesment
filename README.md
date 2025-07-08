@@ -8,7 +8,7 @@ A simple React-based dental clinic management app with mock data, authentication
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/jatinvishwakarma/entnt-assesment.git
    cd entnt-dental-assesment
    ```
 
