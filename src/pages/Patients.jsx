@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { defaultPatient, defaultUser, defaultIncident } from "../data/mockData";
 
 const initialForm = { name: "", dob: "", contact: "", healthInfo: "" };
 
@@ -7,61 +8,31 @@ export default function Patients() {
   const [patients, setPatients] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editingId, setEditingId] = useState(null);
+  const [search, setSearch] = useState(""); // Search state
 
-useEffect(() => {
-  const existingPatients = JSON.parse(localStorage.getItem("patients") || "[]");
+  useEffect(() => {
+    const existingPatients = JSON.parse(localStorage.getItem("patients") || "[]");
 
-  if (existingPatients.length === 0) {
-    const defaultPatient = {
-      id: "p1",
-      name: "John Doe",
-      dob: "1990-05-10",
-      contact: "1234567890",
-      healthInfo: "No allergies",
-      email: "john@entnt.in",
-      password: "patient123"
-    };
+    if (existingPatients.length === 0) {
+      // Add default patient
+      localStorage.setItem("patients", JSON.stringify([defaultPatient]));
 
-    const defaultUser = {
-      email: "john@entnt.in",
-      password: "patient123",
-      role: "Patient",
-      patientId: "p1"
-    };
+      // Add default user
+      const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
+      const updatedUsers = [
+        ...existingUsers.filter(u => u.email !== defaultUser.email),
+        defaultUser
+      ];
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
 
-    // Add default patient
-    localStorage.setItem("patients", JSON.stringify([defaultPatient]));
+      // Add default incident for this patient
+      localStorage.setItem("incidents", JSON.stringify([defaultIncident]));
 
-    // Add default user
-    const existingUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    const updatedUsers = [
-      ...existingUsers.filter(u => u.email !== "john@entnt.in"),
-      defaultUser
-    ];
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-
-    // Add default incident for this patient
-    const defaultIncident = {
-      id: "i1",
-      patientId: "p1",
-      title: "Toothache",
-      description: "Upper molar pain",
-      comments: "Sensitive to cold",
-      appointmentDate: "2025-07-01T10:00:00",
-      cost: 80,
-      status: "Completed",
-      files: [
-        { name: "invoice.pdf", url: "base64string-or-blob-url" },
-        { name: "xray.png", url: "base64string-or-blob-url" }
-      ]
-    };
-    localStorage.setItem("incidents", JSON.stringify([defaultIncident]));
-
-    setPatients([defaultPatient]);
-  } else {
-    setPatients(existingPatients);
-  }
-}, []);
+      setPatients([defaultPatient]);
+    } else {
+      setPatients(existingPatients);
+    }
+  }, []);
 
   const savePatients = (list) => {
     setPatients(list);
@@ -105,9 +76,26 @@ useEffect(() => {
     }
   };
 
+  // Filter patients based on search input
+  const filteredPatients = patients.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.contact.includes(search) ||
+      (p.healthInfo && p.healthInfo.toLowerCase().includes(search.toLowerCase()))
+  );
+
   return (
     <div className="p-6 md:p-10 max-w-5xl mx-auto bg-slate-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6 text-slate-800">Patients Management</h1>
+
+      {/* Search Bar */}
+      <input
+        type="text"
+        placeholder="Search by name, contact, or health info"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="mb-6 px-4 py-2 border border-slate-300 rounded w-full max-w-md"
+      />
 
       <form
         onSubmit={handleSubmit}
@@ -195,7 +183,7 @@ useEffect(() => {
             </tr>
           </thead>
           <tbody>
-            {patients.map((p) => (
+            {filteredPatients.map((p) => (
               <tr key={p.id} className="hover:bg-blue-50 transition">
                 <td className="p-3 border-b">{p.name}</td>
                 <td className="p-3 border-b">{p.dob}</td>
@@ -225,7 +213,7 @@ useEffect(() => {
                 </td>
               </tr>
             ))}
-            {patients.length === 0 && (
+            {filteredPatients.length === 0 && (
               <tr>
                 <td colSpan={5} className="text-center p-4 text-slate-500">
                   No patients found.

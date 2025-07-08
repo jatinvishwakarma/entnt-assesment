@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { defaultPatient, defaultUser, adminUser, defaultIncident } from "../data/mockData";
 
 export default function Login() {
   const { login } = useAuth();
@@ -8,6 +9,24 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+ useEffect(() => {
+    let patients = JSON.parse(localStorage.getItem("patients") || "[]");
+    if (patients.length === 0) {
+      patients = [defaultPatient];
+      localStorage.setItem("patients", JSON.stringify(patients));
+    }
+    let incidents = JSON.parse(localStorage.getItem("incidents") || "[]");
+    if (incidents.length === 0) {
+      incidents = [defaultIncident];
+      localStorage.setItem("incidents", JSON.stringify(incidents));
+    }
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+    if (users.length === 0) {
+      users = [defaultUser, adminUser];
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
