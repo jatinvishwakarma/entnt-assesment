@@ -75,9 +75,10 @@ export default function Login() {
 </button>
 
 
-        <div className="mt-6 text-xs text-slate-500 text-center leading-relaxed">
-          <p><strong>Admin</strong>: admin@entnt.in / admin123</p>
-          <p><strong>Patient</strong>: jatin@entnt.in / patient123</p>
+        <div className="mt-4 text-xs text-slate-500 text-center">
+          Admin: <b>admin@entnt.in</b> / <b>admin123</b>
+          <br />
+          Patient: <b>john@entnt.in</b> / <b>patient123</b>
         </div>
       </form>
     </div>

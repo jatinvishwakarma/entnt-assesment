@@ -5,10 +5,47 @@ export default function Dashboard() {
   const [incidents, setIncidents] = useState([]);
   const [patients, setPatients] = useState([]);
 
-  useEffect(() => {
-    setIncidents(JSON.parse(localStorage.getItem("incidents") || "[]"));
-    setPatients(JSON.parse(localStorage.getItem("patients") || "[]"));
-  }, []);
+useEffect(() => {
+  // Check and initialize default data if needed
+  let existingPatients = JSON.parse(localStorage.getItem("patients") || "[]");
+  let existingIncidents = JSON.parse(localStorage.getItem("incidents") || "[]");
+
+  if (existingPatients.length === 0) {
+    const defaultPatient = {
+      id: "p1",
+      name: "John Doe",
+      dob: "1990-05-10",
+      contact: "1234567890",
+      healthInfo: "No allergies",
+      email: "john@entnt.in",
+      password: "patient123"
+    };
+    existingPatients = [defaultPatient];
+    localStorage.setItem("patients", JSON.stringify(existingPatients));
+  }
+
+  if (existingIncidents.length === 0) {
+    const defaultIncident = {
+      id: "i1",
+      patientId: "p1",
+      title: "Toothache",
+      description: "Upper molar pain",
+      comments: "Sensitive to cold",
+      appointmentDate: "2025-07-01T10:00:00",
+      cost: 80,
+      status: "Completed",
+      files: [
+        { name: "invoice.pdf", url: "base64string-or-blob-url" },
+        { name: "xray.png", url: "base64string-or-blob-url" }
+      ]
+    };
+    existingIncidents = [defaultIncident];
+    localStorage.setItem("incidents", JSON.stringify(existingIncidents));
+  }
+
+  setPatients(existingPatients);
+  setIncidents(existingIncidents);
+}, []);
 
   const nextAppointments = [...incidents]
     .filter(i => i.appointmentDate)
